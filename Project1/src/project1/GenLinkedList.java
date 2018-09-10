@@ -5,6 +5,7 @@ import java.util.List;
 
 public class GenLinkedList<E>
 {
+    //Pointer for Head of List
     private GenNode<E> root;
     
     public static void main(String[] args)
@@ -72,42 +73,54 @@ public class GenLinkedList<E>
         root = new GenNode<>(item);
     }
     
+    //Adds to the front of the list
     public void addFront(E item)
     {
-        //Adds to the front of the list
         GenNode<E> nitem = new GenNode<>(item);
         nitem.next = root;
         root = nitem;
     }
     
+    //Adds to the end of the list
     public void addEnd(E item)
     {
-        //Adds to the end of the list
         GenNode<E> nitem = new GenNode<>(item);
+        
+        //Get to End of List
         GenNode<E> iterator = root;
         while(iterator.next != null)
             iterator = iterator.next;
+        
+        //Append next pointer
         iterator.next = nitem;
     }
     
+    //Removes a node from the front of the list
     public void removeFront()
     {
-        //Removes a node from the front of the list
-        root = root.next;
+        //Replace root with next node
+        if(root.next != null)
+            root = root.next;
+        else
+            root = null;
     }
     
+    //Removes a node from the end of the list
     public void removeEnd()
     {
-        //Removes a node from the end of the list
+        //Get to End of List
         GenNode<E> iterator = root;
         while(iterator.next.next != null)
             iterator = iterator.next;
+        
+        //Remove link to last node
         iterator.next = null;
     }
     
+    //Sets the element at given position, provided it is within the current size
     public void set(int pos, E item)
     {
-        //Sets the element at given position, provided it is within the current size
+        //Iterate to position
         GenNode<E> iterator = root;
         for(int i = 0; i < pos; i++)
         {
@@ -115,12 +128,15 @@ public class GenLinkedList<E>
                 return;
             iterator = iterator.next;
         }
+        
+        //Change contents of node
         iterator.item = item;
     }
     
+    //Returns the element at given position, provided it is within the current size
     public E get(int pos)
     {
-        //Returns the element at given position, provided it is within the current size
+        //Iterate to position
         GenNode<E> iterator = root;
         for(int i = 0; i < pos; i++)
         {
@@ -128,12 +144,15 @@ public class GenLinkedList<E>
                 return null;
             iterator = iterator.next;
         }
+        
+        //Fetch contents of node
         return iterator.item;
     }
     
+    //Swaps the Nodes at given positions, provided both are within the current size
     public void swap(int pos1, int pos2)
     {
-        //Swaps the Nodes at given positions, provided both are within the current size
+        //Iterate to position1
         GenNode<E> iterator1 = root;
         for(int i = 0; i < pos1; i++)
         {
@@ -142,6 +161,7 @@ public class GenLinkedList<E>
             iterator1 = iterator1.next;
         }
         
+        //Iterate to position2
         GenNode<E> iterator2 = root;
         for(int i = 0; i < pos2; i++)
         {
@@ -150,52 +170,59 @@ public class GenLinkedList<E>
             iterator2 = iterator2.next;
         }
         
+        //Ensure both are valid locations
         if(iterator1 == null || iterator2 == null)
             return;
         
+        //Swap contents around
         E tempitem = iterator2.item;
         iterator2.item = iterator1.item;
         iterator1.item = tempitem;
     }
     
+    //Shifts the list forward or backward the given number of nodes, provided it is within the current size
     public void shift(int num)
     {
-        //Shifts the list forward or backward the given number of nodes, provided it is within the current size
         if(root == null || root.next == null)
             return;
         
+        //Shifting Upwards
         if(num > 0)
             for(int i = 0; i < num; i++)
-                shiftUp();
+            {
+                //Get to End of List
+                GenNode<E> iterator = root;
+                while(iterator.next.next != null)
+                    iterator = iterator.next;
+                
+                GenNode<E> temp = iterator.next;
+                iterator.next = null;
+                temp.next = root;
+                root = temp;
+            }
+        
+        //Shifting Downwards
         else if(num < 0)
             for(int i = 0; i > num; i--)
-                shiftDown();
-    }
-    private void shiftUp()
-    {
-        GenNode<E> iterator = root;
-        while(iterator.next.next != null)
-            iterator = iterator.next;
-        GenNode<E> temp = iterator.next;
-        iterator.next = null;
-        temp.next = root;
-        root = temp;
-    }
-    private void shiftDown()
-    {
-        GenNode<E> iterator = root;
-        while(iterator.next != null)
-            iterator = iterator.next;
-        GenNode<E> temp = root;
-        root = root.next;
-        temp.next = null;
-        iterator.next = temp;
+            {
+                //Get to End of List
+                GenNode<E> iterator = root;
+                while(iterator.next != null)
+                    iterator = iterator.next;
+                
+                GenNode<E> temp = root;
+                root = root.next;
+                temp.next = null;
+                iterator.next = temp;
+            }
     }
     
+    //removes all occurences of the given value from the list
     public void removeMatching(E item)
     {
-        //removes all occurences of the given value from the list
         GenNode<E> prev = null;
+        
+        //Get to End of List
         GenNode<E> iterator = root;
         while(iterator != null)
         {
@@ -211,9 +238,10 @@ public class GenLinkedList<E>
         }
     }
     
+    //removes elements starting at the given position and spanning for given amount of elements
     public void erase(int pos, int elements)
     {
-        //removes elements starting at the given position and spanning for given amount of elements
+        //Special case of root
         if(pos == 0)
         {
             GenNode<E> nroot = root;
@@ -227,6 +255,7 @@ public class GenLinkedList<E>
             return;
         }
         
+        //Iterate to position
         GenNode<E> iterator = root;
         for(int i = 1; i < pos; i++)
         {
@@ -235,6 +264,8 @@ public class GenLinkedList<E>
             iterator = iterator.next;
         }
         GenNode parent = iterator;
+        
+        //Iterate through erased nodes
         for(int i = 0; i <= elements; i++)
         {
             if(iterator.next == null)
@@ -244,17 +275,21 @@ public class GenLinkedList<E>
             }
             iterator = iterator.next;
         }
+        
+        //Set as next to skip deleted nodes
         parent.next = iterator;
     }
     
+    //copies each value of the given list into the current list at the given position
     public void insertList(int pos, List<E> list)
     {
-        //copies each value of the given list into the current list at the given position
         if(root == null)
             return;
         
+        //Get to End of List
         GenNode<E> iterator = root;
         
+        //Special case of root
         if(pos == 0)
         {
             GenNode<E> oroot = root;
@@ -278,12 +313,15 @@ public class GenLinkedList<E>
         }
         GenNode<E> nend = iterator.next;
         
+        //Iterate through new Nodes
         for(int i = 0; i < list.size(); i++)
         {
             GenNode<E> temp = new GenNode<>(list.get(i));
             iterator.next = temp;
             iterator = iterator.next;
         }
+        
+        //Connect to rest of list
         iterator.next = nend;
     }
     
@@ -310,7 +348,7 @@ class GenNode<E>
     E item;
     GenNode next;
 
-    public GenNode(E item)
+    GenNode(E item)
     {
         this.item = item;
     }
