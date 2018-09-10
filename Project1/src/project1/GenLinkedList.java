@@ -1,5 +1,6 @@
 package project1;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GenLinkedList<E>
@@ -9,53 +10,61 @@ public class GenLinkedList<E>
     public static void main(String[] args)
     {
         GenLinkedList<Integer> arr = new GenLinkedList<>((int)(Math.random()*100));    //Instantiates List
-        System.out.println("initial: \t" + arr.toString());
+        System.out.println("initial: \t\t" + arr.toString());
         
-        arr.addFront((int)(Math.random()*100));  //Demonstrate addFront
-        System.out.println("addFront(): \t" + arr.toString());
+        int af1 = (int)(Math.random()*100);
+        arr.addFront(af1);  //Demonstrate addFront
+        System.out.println("addFront(" + af1 + "): \t\t" + arr.toString());
         
-        arr.addEnd((int)(Math.random()*100));  //Demonstrate addEnd
-        System.out.println("addEnd(): \t" + arr.toString());
+        int ae1 = (int)(Math.random()*100);
+        arr.addEnd(ae1);  //Demonstrate addEnd
+        System.out.println("addEnd(" + ae1 + "): \t\t" + arr.toString());
         
         for(int i = 0; i < (int)(Math.random()*20); i++)
         {
             arr.addEnd((int)(Math.random()*100));
         }
-        System.out.println("fill array: \t" + arr.toString());
+        System.out.println("fill array: \t\t" + arr.toString());
         
         arr.removeFront();  //Demonstrate removeFront
-        System.out.println("removeFront(): \t" + arr.toString());
+        System.out.println("removeFront(): \t\t" + arr.toString());
         
         arr.removeEnd();    //Demonstrate removeEnd
-        System.out.println("removeEnd(): \t" + arr.toString());
+        System.out.println("removeEnd(): \t\t" + arr.toString());
         
         int t1 = (int)(Math.random()*10);
         int t2 = (int)(Math.random()*100);
         arr.set(t1, t2);    //Demonstrate set
-        System.out.println("set(" + t1 + ", " + t2 + "): \t" + arr.toString());
+        System.out.println("set(" + t1 + ", " + t2 + "): \t\t" + arr.toString());
         
         int t3 = (int)(Math.random()*10);
-        System.out.println("get(" + t3 + "): \t" + arr.get(t1));    //Demonstrate get
+        System.out.println("get(" + t3 + "): \t\t" + arr.get(t3));    //Demonstrate get
         
         int t4 = (int)(Math.random()*10);
         int t5 = (int)(Math.random()*10);
         arr.swap(t4, t5);   //Demonstrate swap
-        System.out.println("swap(" + t4 + ", " + t5 + "): \t" + arr.toString());
+        System.out.println("swap(" + t4 + ", " + t5 + "): \t\t" + arr.toString());
         
         int t6 = (int)(Math.random()*20)-10;
         arr.shift(t6);  //Demonstrate shift
-        System.out.println("shift(" + t6 + "): \t" + arr.toString());
+        System.out.println("shift(" + t6 + "): \t\t" + arr.toString());
         
-        int t7 = (int)(Math.random()*100);
-        arr.removeMatching(t7); //Demonstrate removeMatching
-        System.out.println("remMatch(" + t7 + "): \t" + arr.toString());
+        arr.removeMatching(ae1); //Demonstrate removeMatching
+        System.out.println("removeMatching(" + ae1 + "): \t" + arr.toString());
         
-        int t8 = (int)(Math.random()*10);
-        int t9 = (int)(Math.random()*5);
+        int t8 = (int)(Math.random()*5);
+        int t9 = (int)(Math.random()*5)+1;
         arr.erase(t8, t9);  //Demonstrate erase
-        System.out.println("erase(" + t8 + ", " + t9 + "): \t" + arr.toString());
+        System.out.println("erase(" + t8 + ", " + t9 + "): \t\t" + arr.toString());
         
-        List<Integer> jlist = new List<>();
+        ArrayList<Integer> randarr = new ArrayList<>();
+        for(int i = 0; i < (int)(Math.random()*10)+1; i++)
+            randarr.add((int)(Math.random()*100));
+        System.out.println("random array: \t\t" + randarr.toString());
+        
+        int t10 = (int)(Math.random()*5);
+        arr.insertList(t10, randarr);   //Demonstrate insertList
+        System.out.println("insertList(" + t10 + ", randarr):\t" + arr.toString());
     }
     
     public GenLinkedList(E item)
@@ -99,27 +108,14 @@ public class GenLinkedList<E>
     public void set(int pos, E item)
     {
         //Sets the element at given position, provided it is within the current size
-        GenNode<E> nitem = new GenNode<>(item);
-        if(pos == 0)
-        {
-            nitem.next = root;
-            root = nitem;
-            return;
-        }
-        
-        //Acquire Position Node
         GenNode<E> iterator = root;
-        for(int i = 1; i < pos; i++)
+        for(int i = 0; i < pos; i++)
         {
             if(iterator.next == null)
                 return;
             iterator = iterator.next;
         }
-        
-        //Shift Positions of previously placed Nodes
-        GenNode<E> pitem = iterator.next;
-        iterator.next = nitem;
-        nitem.next = pitem;
+        iterator.item = item;
     }
     
     public E get(int pos)
@@ -138,39 +134,174 @@ public class GenLinkedList<E>
     public void swap(int pos1, int pos2)
     {
         //Swaps the Nodes at given positions, provided both are within the current size
+        GenNode<E> iterator1 = root;
+        for(int i = 0; i < pos1; i++)
+        {
+            if(iterator1.next == null)
+                return;
+            iterator1 = iterator1.next;
+        }
+        
+        GenNode<E> iterator2 = root;
+        for(int i = 0; i < pos2; i++)
+        {
+            if(iterator2.next == null)
+                return;
+            iterator2 = iterator2.next;
+        }
+        
+        if(iterator1 == null || iterator2 == null)
+            return;
+        
+        E tempitem = iterator2.item;
+        iterator2.item = iterator1.item;
+        iterator1.item = tempitem;
     }
     
     public void shift(int num)
     {
         //Shifts the list forward or backward the given number of nodes, provided it is within the current size
+        if(root == null || root.next == null)
+            return;
+        
+        if(num > 0)
+            for(int i = 0; i < num; i++)
+                shiftUp();
+        else if(num < 0)
+            for(int i = 0; i > num; i--)
+                shiftDown();
+    }
+    private void shiftUp()
+    {
+        GenNode<E> iterator = root;
+        while(iterator.next.next != null)
+            iterator = iterator.next;
+        GenNode<E> temp = iterator.next;
+        iterator.next = null;
+        temp.next = root;
+        root = temp;
+    }
+    private void shiftDown()
+    {
+        GenNode<E> iterator = root;
+        while(iterator.next != null)
+            iterator = iterator.next;
+        GenNode<E> temp = root;
+        root = root.next;
+        temp.next = null;
+        iterator.next = temp;
     }
     
     public void removeMatching(E item)
     {
-        //A
+        //removes all occurences of the given value from the list
+        GenNode<E> prev = null;
+        GenNode<E> iterator = root;
+        while(iterator != null)
+        {
+            if(iterator.item == item)
+            {
+                if(prev == null)
+                    root = iterator.next;
+                else
+                    prev.next = iterator.next;
+            }
+            prev = iterator;
+            iterator = iterator.next;
+        }
     }
     
     public void erase(int pos, int elements)
     {
-        //A
+        //removes elements starting at the given position and spanning for given amount of elements
+        if(pos == 0)
+        {
+            GenNode<E> nroot = root;
+            for(int i = 0; i < elements; i++)
+            {
+                if(nroot.next == null)
+                    break;
+                nroot = nroot.next;
+            }
+            root = nroot;
+            return;
+        }
+        
+        GenNode<E> iterator = root;
+        for(int i = 1; i < pos; i++)
+        {
+            if(iterator.next == null)
+                return;
+            iterator = iterator.next;
+        }
+        GenNode parent = iterator;
+        for(int i = 0; i <= elements; i++)
+        {
+            if(iterator.next == null)
+            {
+                iterator = null;
+                break;
+            }
+            iterator = iterator.next;
+        }
+        parent.next = iterator;
     }
     
     public void insertList(int pos, List<E> list)
     {
-        //A
+        //copies each value of the given list into the current list at the given position
+        if(root == null)
+            return;
+        
+        GenNode<E> iterator = root;
+        
+        if(pos == 0)
+        {
+            GenNode<E> oroot = root;
+            root = new GenNode<>(list.get(0));
+            iterator = root;
+            for(int i = 1; i < list.size(); i++)
+            {
+                GenNode<E> t = new GenNode<>(list.get(i));
+                iterator.next = t;
+                iterator = iterator.next;
+            }
+            iterator.next = oroot;
+            return;
+        }
+        
+        for(int i = 0; i < pos; i++)
+        {
+            if(iterator.next == null)
+                break;
+            iterator = iterator.next;
+        }
+        GenNode<E> nend = iterator.next;
+        
+        for(int i = 0; i < list.size(); i++)
+        {
+            GenNode<E> temp = new GenNode<>(list.get(i));
+            iterator.next = temp;
+            iterator = iterator.next;
+        }
+        iterator.next = nend;
     }
     
     @Override
     public String toString()
     {
-        String out = root.item + " ";
+        if(root == null)
+            return "[ ]";
+        
+        String out = "[" + root.item;
         GenNode<E> iterator = root;
         while(iterator.next != null)
         {
+            out += ", ";
             iterator = iterator.next;
-            out += iterator.item + " ";
+            out += iterator.item;
         }
-        return out;
+        return out + "]";
     }
 }
 
