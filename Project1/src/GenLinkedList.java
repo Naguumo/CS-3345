@@ -1,5 +1,3 @@
-package project1;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,13 +11,13 @@ public class GenLinkedList<E>
         GenLinkedList<Integer> arr = new GenLinkedList<>((int)(Math.random()*100));    //Instantiates List
         System.out.println("initial: \t\t" + arr.toString());
         
-        int af1 = (int)(Math.random()*100);
-        arr.addFront(af1);  //Demonstrate addFront
-        System.out.println("addFront(" + af1 + "): \t\t" + arr.toString());
+        int t1 = (int)(Math.random()*100);
+        arr.addFront(t1);  //Demonstrate addFront
+        System.out.println("addFront(" + t1 + "): \t\t" + arr.toString());
         
-        int ae1 = (int)(Math.random()*100);
-        arr.addEnd(ae1);  //Demonstrate addEnd
-        System.out.println("addEnd(" + ae1 + "): \t\t" + arr.toString());
+        int t2 = (int)(Math.random()*100);
+        arr.addEnd(t2);  //Demonstrate addEnd
+        System.out.println("addEnd(" + t2 + "): \t\t" + arr.toString());
         
         for(int i = 0; i < (int)(Math.random()*20); i++)
         {
@@ -33,39 +31,39 @@ public class GenLinkedList<E>
         arr.removeEnd();    //Demonstrate removeEnd
         System.out.println("removeEnd(): \t\t" + arr.toString());
         
-        int t1 = (int)(Math.random()*10);
-        int t2 = (int)(Math.random()*100);
-        arr.set(t1, t2);    //Demonstrate set
-        System.out.println("set(" + t1 + ", " + t2 + "): \t\t" + arr.toString());
-        
         int t3 = (int)(Math.random()*10);
-        System.out.println("get(" + t3 + "): \t\t" + arr.get(t3));    //Demonstrate get
+        int t4 = (int)(Math.random()*100);
+        arr.set(t3, t4);    //Demonstrate set
+        System.out.println("set(" + t3 + ", " + t4 + "): \t\t" + arr.toString());
         
-        int t4 = (int)(Math.random()*10);
-        int t5 = (int)(Math.random()*10);
-        arr.swap(t4, t5);   //Demonstrate swap
-        System.out.println("swap(" + t4 + ", " + t5 + "): \t\t" + arr.toString());
+        int t5 = (int)(Math.random()*5);
+        System.out.println("get(" + t5 + "): \t\t" + arr.get(t5));    //Demonstrate get
         
-        int t6 = (int)(Math.random()*20)-10;
-        arr.shift(t6);  //Demonstrate shift
-        System.out.println("shift(" + t6 + "): \t\t" + arr.toString());
+        int t6 = (int)(Math.random()*5);
+        int t7 = (int)(Math.random()*5);
+        arr.swap(t6, t7);   //Demonstrate swap
+        System.out.println("swap(" + t6 + ", " + t7 + "): \t\t" + arr.toString());
         
-        arr.removeMatching(ae1); //Demonstrate removeMatching
-        System.out.println("removeMatching(" + ae1 + "): \t" + arr.toString());
+        int t8 = (int)(Math.random()*20)-10;
+        arr.shift(t8);  //Demonstrate shift
+        System.out.println("shift(" + t8 + "): \t\t" + arr.toString());
         
-        int t8 = (int)(Math.random()*5);
-        int t9 = (int)(Math.random()*5)+1;
-        arr.erase(t8, t9);  //Demonstrate erase
-        System.out.println("erase(" + t8 + ", " + t9 + "): \t\t" + arr.toString());
+        arr.removeMatching(t2); //Demonstrate removeMatching
+        System.out.println("removeMatching(" + t2 + "): \t" + arr.toString());
+        
+        int t9 = (int)(Math.random()*5);
+        int t10 = (int)(Math.random()*5)+1;
+        arr.erase(t9, t10);  //Demonstrate erase
+        System.out.println("erase(" + t9 + ", " + t10 + "): \t\t" + arr.toString());
         
         ArrayList<Integer> randarr = new ArrayList<>();
         for(int i = 0; i < (int)(Math.random()*10)+1; i++)
             randarr.add((int)(Math.random()*100));
         System.out.println("random array: \t\t" + randarr.toString());
         
-        int t10 = (int)(Math.random()*5);
-        arr.insertList(t10, randarr);   //Demonstrate insertList
-        System.out.println("insertList(" + t10 + ", randarr):\t" + arr.toString());
+        int t11 = (int)(Math.random()*5);
+        arr.insertList(t11, randarr);   //Demonstrate insertList
+        System.out.println("insertList(" + t11 + ", randarr):\t" + arr.toString());
     }
     
     public GenLinkedList(E item)
@@ -84,31 +82,20 @@ public class GenLinkedList<E>
     //Adds to the end of the list
     public void addEnd(E item)
     {
-        GenNode<E> nitem = new GenNode<>(item);
-        
-        //Get to End of List
-        GenNode<E> iterator = root;
-        while(iterator.next != null)
-            iterator = iterator.next;
-        
-        //Append next pointer
-        iterator.next = nitem;
+       getLast().next = new GenNode<>(item);
     }
     
     //Removes a node from the front of the list
     public void removeFront()
     {
-        //Replace root with next node
-        if(root.next != null)
+        if(root != null)
             root = root.next;
-        else
-            root = null;
     }
     
     //Removes a node from the end of the list
     public void removeEnd()
     {
-        //Get to End of List
+        //Get to 2nd Last of List
         GenNode<E> iterator = root;
         while(iterator.next.next != null)
             iterator = iterator.next;
@@ -120,23 +107,24 @@ public class GenLinkedList<E>
     //Sets the element at given position, provided it is within the current size
     public void set(int pos, E item)
     {
-        //Iterate to position
-        GenNode<E> iterator = root;
-        for(int i = 0; i < pos; i++)
-        {
-            if(iterator.next == null)
-                return;
-            iterator = iterator.next;
-        }
-        
+        GenNode<E> iterator = getNode(pos);
         //Change contents of node
-        iterator.item = item;
+        if(iterator != null)
+            iterator.item = item;
     }
     
     //Returns the element at given position, provided it is within the current size
     public E get(int pos)
     {
-        //Iterate to position
+        GenNode<E> iterator = getNode(pos);  
+        //Fetch contents of node
+        if(iterator != null)
+            return iterator.item;
+        return null;
+    }
+    
+    private GenNode<E> getNode(int pos)
+    {
         GenNode<E> iterator = root;
         for(int i = 0; i < pos; i++)
         {
@@ -144,31 +132,22 @@ public class GenLinkedList<E>
                 return null;
             iterator = iterator.next;
         }
-        
-        //Fetch contents of node
-        return iterator.item;
+        return iterator;
+    }
+    
+    private GenNode<E> getLast()
+    {
+        GenNode<E> iterator = root;
+        while(iterator.next != null)
+            iterator = iterator.next;
+        return iterator;
     }
     
     //Swaps the Nodes at given positions, provided both are within the current size
     public void swap(int pos1, int pos2)
     {
-        //Iterate to position1
-        GenNode<E> iterator1 = root;
-        for(int i = 0; i < pos1; i++)
-        {
-            if(iterator1.next == null)
-                return;
-            iterator1 = iterator1.next;
-        }
-        
-        //Iterate to position2
-        GenNode<E> iterator2 = root;
-        for(int i = 0; i < pos2; i++)
-        {
-            if(iterator2.next == null)
-                return;
-            iterator2 = iterator2.next;
-        }
+        GenNode<E> iterator1 = getNode(pos1);
+        GenNode<E> iterator2 = getNode(pos2);
         
         //Ensure both are valid locations
         if(iterator1 == null || iterator2 == null)
@@ -190,7 +169,7 @@ public class GenLinkedList<E>
         if(num > 0)
             for(int i = 0; i < num; i++)
             {
-                //Get to End of List
+                //Get to 2nd Last of List
                 GenNode<E> iterator = root;
                 while(iterator.next.next != null)
                     iterator = iterator.next;
@@ -205,15 +184,10 @@ public class GenLinkedList<E>
         else if(num < 0)
             for(int i = 0; i > num; i--)
             {
-                //Get to End of List
-                GenNode<E> iterator = root;
-                while(iterator.next != null)
-                    iterator = iterator.next;
-                
                 GenNode<E> temp = root;
                 root = root.next;
                 temp.next = null;
-                iterator.next = temp;
+                getLast().next = temp;
             }
     }
     
@@ -221,11 +195,12 @@ public class GenLinkedList<E>
     public void removeMatching(E item)
     {
         GenNode<E> prev = null;
-        
-        //Get to End of List
         GenNode<E> iterator = root;
+        
+        //Iterate through list
         while(iterator != null)
         {
+            //Remove matching item
             if(iterator.item == item)
             {
                 if(prev == null)
@@ -286,7 +261,6 @@ public class GenLinkedList<E>
         if(root == null)
             return;
         
-        //Get to End of List
         GenNode<E> iterator = root;
         
         //Special case of root
@@ -297,8 +271,7 @@ public class GenLinkedList<E>
             iterator = root;
             for(int i = 1; i < list.size(); i++)
             {
-                GenNode<E> t = new GenNode<>(list.get(i));
-                iterator.next = t;
+                iterator.next = new GenNode<>(list.get(i));
                 iterator = iterator.next;
             }
             iterator.next = oroot;
@@ -343,6 +316,7 @@ public class GenLinkedList<E>
     }
 }
 
+//Basic Node Subclass
 class GenNode<E>
 {
     E item;
