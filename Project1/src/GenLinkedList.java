@@ -74,8 +74,7 @@ public class GenLinkedList<E>
     //Adds to the front of the list
     public void addFront(E item)
     {
-        GenNode<E> nitem = new GenNode<>(item);
-        nitem.next = root;
+        GenNode<E> nitem = new GenNode<>(item, root);
         root = nitem;
     }
     
@@ -179,7 +178,6 @@ public class GenLinkedList<E>
                 temp.next = root;
                 root = temp;
             }
-        
         //Shifting Downwards
         else if(num < 0)
             for(int i = 0; i > num; i--)
@@ -231,14 +229,10 @@ public class GenLinkedList<E>
         }
         
         //Iterate to position
-        GenNode<E> iterator = root;
-        for(int i = 1; i < pos; i++)
-        {
-            if(iterator.next == null)
-                return;
-            iterator = iterator.next;
-        }
-        GenNode parent = iterator;
+        GenNode<E> iterator = getNode(pos-1);
+        if(iterator == null)
+            return;
+        GenNode<E> parent = iterator;
         
         //Iterate through erased nodes
         for(int i = 0; i <= elements; i++)
@@ -258,10 +252,10 @@ public class GenLinkedList<E>
     //copies each value of the given list into the current list at the given position
     public void insertList(int pos, List<E> list)
     {
-        if(root == null)
+        if(root == null || list.isEmpty())
             return;
         
-        GenNode<E> iterator = root;
+        GenNode<E> iterator;
         
         //Special case of root
         if(pos == 0)
@@ -278,19 +272,15 @@ public class GenLinkedList<E>
             return;
         }
         
-        for(int i = 0; i < pos; i++)
-        {
-            if(iterator.next == null)
-                break;
-            iterator = iterator.next;
-        }
+        iterator = getNode(pos-1);
+        if(iterator == null)
+            return;
         GenNode<E> nend = iterator.next;
         
         //Iterate through new Nodes
         for(int i = 0; i < list.size(); i++)
         {
-            GenNode<E> temp = new GenNode<>(list.get(i));
-            iterator.next = temp;
+            iterator.next = new GenNode<>(list.get(i));
             iterator = iterator.next;
         }
         
@@ -325,5 +315,10 @@ class GenNode<E>
     GenNode(E item)
     {
         this.item = item;
+    }
+    GenNode(E item, GenNode<E> next)
+    {
+        this.item = item;
+        this.next = next;
     }
 }
