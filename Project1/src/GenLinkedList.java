@@ -3,8 +3,10 @@ import java.util.List;
 
 public class GenLinkedList<E>
 {
-    //Pointer for Head of List
-    private GenNode<E> root;
+    //Pointers for List
+    private GenNode<E> head;
+    private GenNode<E> tail;
+    private int len;
     
     public static void main(String[] args)
     {
@@ -66,85 +68,120 @@ public class GenLinkedList<E>
         System.out.println("insertList(" + t11 + ", randarr):\t" + arr.toString());
     }
     
+    //Empty Constructor
+    public GenLinkedList()
+    {
+        head = tail = null;
+        len = 0;
+    }
+    //1 item Constructor
     public GenLinkedList(E item)
     {
-        root = new GenNode<>(item);
+        head = tail = new GenNode<>(item);
+        len = 1;
     }
     
     //Adds to the front of the list
     public void addFront(E item)
     {
-        GenNode<E> nitem = new GenNode<>(item, root);
-        root = nitem;
+        head = new GenNode<>(item, head);
+        if(tail == null)
+            tail = head;
+        len++;
     }
     
     //Adds to the end of the list
     public void addEnd(E item)
     {
-       getLast().next = new GenNode<>(item);
+        if(head == null)
+            head = tail = new GenNode<>(item);
+        else
+        {
+            tail.next = new GenNode<>(item);
+            tail = tail.next;
+        }
+        len++;
     }
     
     //Removes a node from the front of the list
-    public void removeFront()
+    public E removeFront()
     {
-        if(root != null)
-            root = root.next;
+        E node = null;
+        if(head != null)
+        {
+            node = head.item;
+            if(head == tail)
+                head = tail = null;
+            else
+                head = head.next;
+            len--;
+        }
+        return node;
     }
     
     //Removes a node from the end of the list
-    public void removeEnd()
+    public E removeEnd()
     {
-        //Get to 2nd Last of List
-        GenNode<E> iterator = root;
-        while(iterator.next.next != null)
-            iterator = iterator.next;
-        
-        //Remove link to last node
-        iterator.next = null;
+        E node = null;
+        if(head != null)
+        {
+            if(head == tail)
+            {
+                node = head.item;
+                head = tail = null;
+            }
+            else
+            {
+                node = tail.item;
+                        
+                //Get to 2nd Last of List
+                GenNode<E> iterator = head;
+                while(iterator.next != tail)
+                    iterator = iterator.next;
+
+                //Remove link to last node
+                iterator.next = null;
+                tail = iterator;
+            }
+            len--;    
+        }
+        return node;
     }
     
     //Sets the element at given position, provided it is within the current size
     public void set(int pos, E item)
     {
-        GenNode<E> iterator = getNode(pos);
-        //Change contents of node
-        if(iterator != null)
-            iterator.item = item;
+        if(pos < len)
+            getNode(pos).item = item;
     }
     
     //Returns the element at given position, provided it is within the current size
     public E get(int pos)
     {
-        GenNode<E> iterator = getNode(pos);  
-        //Fetch contents of node
-        if(iterator != null)
-            return iterator.item;
-        return null;
+        return (pos >= len) ? null : getNode(pos).item;
     }
     
     private GenNode<E> getNode(int pos)
     {
-        GenNode<E> iterator = root;
+        if(pos >= len || head == null)
+            return null;
+        
+        GenNode<E> iterator = head;
         for(int i = 0; i < pos; i++)
         {
-            if(iterator.next == null)
+            if(iterator == tail)
                 return null;
             iterator = iterator.next;
         }
         return iterator;
     }
     
-    private GenNode<E> getLast()
-    {
-        GenNode<E> iterator = root;
-        while(iterator.next != null)
-            iterator = iterator.next;
-        return iterator;
-    }
-    
     //Swaps the Nodes at given positions, provided both are within the current size
     public void swap(int pos1, int pos2)
     {
+        if(pos1 >= len || pos2 >= len)
+            return;
+        
         GenNode<E> iterator1 = getNode(pos1);
         GenNode<E> iterator2 = getNode(pos2);
         
@@ -161,39 +198,24 @@ public class GenLinkedList<E>
     //Shifts the list forward or backward the given number of nodes, provided it is within the current size
     public void shift(int num)
     {
-        if(root == null || root.next == null)
+        if(head == null || head == tail)
             return;
         
         //Shifting Upwards
         if(num > 0)
             for(int i = 0; i < num; i++)
-            {
-                //Get to 2nd Last of List
-                GenNode<E> iterator = root;
-                while(iterator.next.next != null)
-                    iterator = iterator.next;
-                
-                GenNode<E> temp = iterator.next;
-                iterator.next = null;
-                temp.next = root;
-                root = temp;
-            }
+                this.addFront(this.removeEnd());
         //Shifting Downwards
         else if(num < 0)
             for(int i = 0; i > num; i--)
-            {
-                GenNode<E> temp = root;
-                root = root.next;
-                temp.next = null;
-                getLast().next = temp;
-            }
+                this.addEnd(this.removeFront());
     }
     
     //removes all occurences of the given value from the list
     public void removeMatching(E item)
     {
         GenNode<E> prev = null;
-        GenNode<E> iterator = root;
+        GenNode<E> iterator = head;
         
         //Iterate through list
         while(iterator != null)
@@ -202,9 +224,14 @@ public class GenLinkedList<E>
             if(iterator.item == item)
             {
                 if(prev == null)
-                    root = iterator.next;
+                    removeFront();
+                else if(iterator.next == tail)
+                    removeEnd();
                 else
+                {
                     prev.next = iterator.next;
+                    len--;
+                }
             }
             prev = iterator;
             iterator = iterator.next;
@@ -214,88 +241,79 @@ public class GenLinkedList<E>
     //removes elements starting at the given position and spanning for given amount of elements
     public void erase(int pos, int elements)
     {
-        //Special case of root
+        if(pos >= len)
+            return;
+        
+        //case of head
         if(pos == 0)
         {
-            GenNode<E> nroot = root;
             for(int i = 0; i < elements; i++)
-            {
-                if(nroot.next == null)
-                    break;
-                nroot = nroot.next;
-            }
-            root = nroot;
-            return;
+                this.removeFront();
         }
-        
-        //Iterate to position
-        GenNode<E> iterator = getNode(pos-1);
-        if(iterator == null)
-            return;
-        GenNode<E> parent = iterator;
-        
-        //Iterate through erased nodes
-        for(int i = 0; i <= elements; i++)
+        //Case of tail
+        else if(pos+elements >= len)
         {
-            if(iterator.next == null)
-            {
-                iterator = null;
-                break;
-            }
-            iterator = iterator.next;
+            for(int i = 0; i < elements; i++)
+                this.removeEnd();
         }
-        
-        //Set as next to skip deleted nodes
-        parent.next = iterator;
+        else
+        {
+            GenNode<E> begin = getNode(pos-1);
+            GenNode<E> end = getNode(pos+elements);
+            begin.next = end;
+            len -= elements;
+        }
     }
     
     //copies each value of the given list into the current list at the given position
     public void insertList(int pos, List<E> list)
     {
-        if(root == null || list.isEmpty())
+        if(head == null || list.isEmpty() || pos > len)
             return;
         
-        GenNode<E> iterator;
-        
-        //Special case of root
+        //Case of head
         if(pos == 0)
         {
-            GenNode<E> oroot = root;
-            root = new GenNode<>(list.get(0));
-            iterator = root;
-            for(int i = 1; i < list.size(); i++)
+            for(int i = list.size()-1; i >= 0; i--)
+                addFront(list.get(i));
+        }
+        //Case of tail
+        else if(pos == len)
+        {
+            for(int i = 0; i < list.size(); i++)
+                addEnd(list.get(i));
+        }
+        else
+        {
+            GenNode<E> iterator = getNode(pos-1);
+            GenNode<E> nend = iterator.next;
+
+            //Iterate through new Nodes
+            for(int i = 0; i < list.size(); i++)
             {
                 iterator.next = new GenNode<>(list.get(i));
+                len++;
                 iterator = iterator.next;
             }
-            iterator.next = oroot;
-            return;
+
+            //Connect to rest of list
+            iterator.next = nend;
         }
-        
-        iterator = getNode(pos-1);
-        if(iterator == null)
-            return;
-        GenNode<E> nend = iterator.next;
-        
-        //Iterate through new Nodes
-        for(int i = 0; i < list.size(); i++)
-        {
-            iterator.next = new GenNode<>(list.get(i));
-            iterator = iterator.next;
-        }
-        
-        //Connect to rest of list
-        iterator.next = nend;
+    }
+    
+    public int size()
+    {
+        return len;
     }
     
     @Override
     public String toString()
     {
-        if(root == null)
+        if(head == null)
             return "[ ]";
         
-        String out = "[" + root.item;
-        GenNode<E> iterator = root;
+        String out = "[" + head.item;
+        GenNode<E> iterator = head;
         while(iterator.next != null)
         {
             out += ", ";
