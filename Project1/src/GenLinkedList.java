@@ -35,16 +35,32 @@ public class GenLinkedList<E>
         
         int t3 = (int)(Math.random()*10);
         int t4 = (int)(Math.random()*100);
-        arr.set(t3, t4);    //Demonstrate set
-        System.out.println("set(" + t3 + ", " + t4 + "): \t\t" + arr.toString());
+        try{
+            arr.set(t3, t4);    //Demonstrate set
+            System.out.println("set(" + t3 + ", " + t4 + "): \t\t" + arr.toString());
+        }catch(IndexOutOfBoundsException e)
+        {
+            System.out.println("set(" + t3 + ", " + t4 + "): \t\tOut Of Bounds");
+        }
         
         int t5 = (int)(Math.random()*5);
+        try{
         System.out.println("get(" + t5 + "): \t\t" + arr.get(t5));    //Demonstrate get
+        }catch(IndexOutOfBoundsException e)
+        {
+            System.out.println("get(" + t5 + "): \t\tOut Of Bounds");
+        }
         
         int t6 = (int)(Math.random()*5);
         int t7 = (int)(Math.random()*5);
-        arr.swap(t6, t7);   //Demonstrate swap
-        System.out.println("swap(" + t6 + ", " + t7 + "): \t\t" + arr.toString());
+        try
+        {
+            arr.swap(t6, t7);   //Demonstrate swap
+            System.out.println("swap(" + t6 + ", " + t7 + "): \t\t" + arr.toString());
+        }catch(IndexOutOfBoundsException e)
+        {
+            System.out.println("swap(" + t6 + ", " + t7 + "): \t\tOut Of Bounds");
+        }
         
         int t8 = (int)(Math.random()*20)-10;
         arr.shift(t8);  //Demonstrate shift
@@ -55,8 +71,14 @@ public class GenLinkedList<E>
         
         int t9 = (int)(Math.random()*5);
         int t10 = (int)(Math.random()*5)+1;
-        arr.erase(t9, t10);  //Demonstrate erase
-        System.out.println("erase(" + t9 + ", " + t10 + "): \t\t" + arr.toString());
+        try
+        {
+            arr.erase(t9, t10);  //Demonstrate erase
+            System.out.println("erase(" + t9 + ", " + t10 + "): \t\t" + arr.toString());
+        }catch(IndexOutOfBoundsException e)
+        {
+            System.out.println("erase(" + t9 + ", " + t10 + "): \t\tOut Of Bounds");
+        }
         
         ArrayList<Integer> randarr = new ArrayList<>();
         for(int i = 0; i < (int)(Math.random()*10)+1; i++)
@@ -64,8 +86,14 @@ public class GenLinkedList<E>
         System.out.println("random array: \t\t" + randarr.toString());
         
         int t11 = (int)(Math.random()*5);
-        arr.insertList(t11, randarr);   //Demonstrate insertList
-        System.out.println("insertList(" + t11 + ", randarr):\t" + arr.toString());
+        try
+        {
+            arr.insertList(t11, randarr);   //Demonstrate insertList
+            System.out.println("insertList(" + t11 + ", randarr):\t" + arr.toString());
+        }catch(IndexOutOfBoundsException e)
+        {
+            System.out.println("insertList(" + t11 + ", randarr):\tOut Of Bounds");
+        }
     }
     
     //Empty Constructor
@@ -136,7 +164,7 @@ public class GenLinkedList<E>
                         
                 //Get to 2nd Last of List
                 GenNode<E> iterator = head;
-                while(iterator.next != tail)
+                while(iterator.next.next != null)
                     iterator = iterator.next;
 
                 //Remove link to last node
@@ -151,20 +179,23 @@ public class GenLinkedList<E>
     //Sets the element at given position, provided it is within the current size
     public void set(int pos, E item)
     {
-        if(pos < len)
-            getNode(pos).item = item;
+        if(pos >= len)
+            throw new IndexOutOfBoundsException();
+        getNode(pos).item = item;
     }
     
     //Returns the element at given position, provided it is within the current size
     public E get(int pos)
     {
-        return (pos >= len) ? null : getNode(pos).item;
+        if(pos >= len)
+            throw new IndexOutOfBoundsException();
+        return getNode(pos).item;
     }
     
     private GenNode<E> getNode(int pos)
     {
         if(pos >= len || head == null)
-            return null;
+            throw new IndexOutOfBoundsException();
         
         GenNode<E> iterator = head;
         for(int i = 0; i < pos; i++)
@@ -180,7 +211,7 @@ public class GenLinkedList<E>
     public void swap(int pos1, int pos2)
     {
         if(pos1 >= len || pos2 >= len)
-            return;
+            throw new IndexOutOfBoundsException();
         
         GenNode<E> iterator1 = getNode(pos1);
         GenNode<E> iterator2 = getNode(pos2);
@@ -242,9 +273,9 @@ public class GenLinkedList<E>
     public void erase(int pos, int elements)
     {
         if(pos >= len)
-            return;
+            throw new IndexOutOfBoundsException();
         
-        //case of head
+        //Case of head
         if(pos == 0)
         {
             for(int i = 0; i < elements; i++)
@@ -253,7 +284,8 @@ public class GenLinkedList<E>
         //Case of tail
         else if(pos+elements >= len)
         {
-            for(int i = 0; i < elements; i++)
+            GenNode<E> begin = getNode(pos-1);
+            while(begin != tail)
                 this.removeEnd();
         }
         else
@@ -269,7 +301,7 @@ public class GenLinkedList<E>
     public void insertList(int pos, List<E> list)
     {
         if(head == null || list.isEmpty() || pos > len)
-            return;
+            throw new IndexOutOfBoundsException();
         
         //Case of head
         if(pos == 0)
